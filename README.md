@@ -121,294 +121,167 @@ templates for correctness, and opens a document preview in your default browser.
 
 Two things are provided in this example:
 
-1. An example JSON `input.json` file. This will the output from your existing
-   automation tool, e.g. API output, health check, day-1 build tool, etc. If
-   your tool doesn't currently produce JSON, it probably can. See the
-   [JSON Generation Examples](#json-generation-examples) section for ideas.
-2. Example templates. Templates are written in HTML and use a simple templating
-   language for basic logic. Detailes can be found in the
-   [Templating](#templating) section of this guide and examples in the
-   [Template Examples](#template-examples) section. The simple example provides
-   examples of common patterns that will be present in _most_ templates.
+1. An example `input.html` file. This is the HTML content that will be inserted
+   into the deliverable document. In a real workflow, you generate this file
+   from your existing automation tool using a templating engine suited to your
+   language — e.g. Jinja2 for Python, Handlebars for JavaScript, or Templ for
+   Go. See the [Generating Input Content](#generating-input-content) section for
+   examples.
+2. Optionally, a `context.json` file for populating `{{tag}}` placeholders
+   directly in the Word document template (e.g. cover page fields, headers,
+   footers). See [Direct Template Tags](#direct-template-tags).
 
 Running the development server does the following:
 
-1. Reads `input.json` as an input "context"
-2. Uses the context to render the HTML templates. The starting template is
-   `main.html` and other templates are included with the `include` statement.
-   This generates a single `out.html` file representing your deliverable
-   document.
-3. The `out.html` content gets rendered into the `main` bookmark in the
-   deliverable document. Docgen is using a built-in CX document template for
-   this, but you can also use your own custom template containing pre-existing
-   content.
+1. Reads the `input.html` (or `.md`) file as the document body content.
+2. Inserts that content into the `main` bookmark in the deliverable document.
+   Docgen uses a built-in CX document template by default, but you can supply
+   your own custom template with pre-existing content.
+3. Optionally renders `{{tag}}` placeholders in the Word template using values
+   from `context.json`.
 
 See the [Comprehensive Guide](#comprehensive-guide) for detailed usage and
 examples.
 
 ## Comprehensive Guide
 
-### JSON input
+### Generating Input Content
 
-The input data is standard JSON.
+Docgen accepts a pre-rendered HTML or Markdown file as its input. You generate
+this file using whatever templating solution is idiomatic for your tool's
+language. This keeps docgen focused on document conversion while letting you use
+mature, well-documented templating engines you already know.
 
-#### Basic Python
+#### Python — Jinja2
 
-If your tool is written in Python, data can be written to JSON directly, using
-the built-in `json` library:
-
-```python
-import json
-my_app_data = {"devices": [{"name": "device01"}, {"name": "device02"}]}
-with open("input.json") as f:
-  f.write(json.dumps(my_app_data))
-```
-
-If you're programmatically generating a document, e.g. with `python-docx` or
-similar, you can instead write your data to a single dictionary and dump it to
-JSON.
-
-#### CSV
-
-In Python, CSV can be read from a file with the built-in CSV module. This
-example assumes your CSV has a header row and uses the headers as the dictionary
-keys:
+[Jinja2](https://jinja.palletsprojects.com/) is the standard templating engine
+for Python tools.
 
 ```python
-import csv
+from jinja2 import Environment, FileSystemLoader
 
-with open("data.csv") as f:
-  csv_reader = csv.DictReader(f, delimiter=',')
-with open("input.json") as f:
-  f.write(json.dumps(list(csv_reader)))
+env = Environment(loader=FileSystemLoader("."))
+template = env.get_template("report.html.j2")
+
+data = {
+    "devices": [
+        {"name": "switch01", "ip": "10.0.0.1"},
+        {"name": "switch02", "ip": "10.0.0.2"},
+    ]
+}
+
+with open("input.html", "w") as f:
+    f.write(template.render(**data))
 ```
 
-This module also works with built in objects as opposed to reading from a file:
-
-```python
-import csv
-
-data = ["name,ip", "device01,10.0.0.1", "device02,10.0.0.2"]
-csv_reader = csv.DictReader(["header1"], delimiter=',')
-with open("input.json") as f:
-  f.write(json.dumps(list(csv_reader)))
-
-# [{"name": "device01", "ip": "10.0.0.1"}, {"name": "device02", "ip": "10.0.0.2"}]
-```
-
-#### Excel
-
-If your data is in Excel, you can either save it to CSV or use the `openpyxl`
-library to parse it into Python objects. Once in Python, use the built in JSON
-module to write to JSON.
-
-### Templating
-
-Templating is performed by Go's text/template library. Basic documentation on
-this library is provided in the
-[Go documentation for text/template](https://pkg.go.dev/text/template).
-
-Additionally, the [sprig helper functions](http://masterminds.github.io/sprig/)
-are included, which provide a number of useful helper functions.
-
-If coming from Jinja2, you may notice these templates have very limited features
-in comparison. Specifically, complex code is not written into templates. This is
-intentional and is a feature, as it encourages the separation of code logic from
-view logic. This separation is an important principle of maintainable code.
-
-#### Basic building blocks
-
-##### Variables
-
-Variables are specified with a dot notation, e.g.:
-
-```json
-{ "name": "device01" }
-```
+**`report.html.j2`**
 
 ```html
-<h1>Configuration for {{.name}}</h1>
+<h1>Device Report</h1>
+<table>
+  <tr><th>Name</th><th>IP</th></tr>
+  {% for device in devices %}
+  <tr><td>{{ device.name }}</td><td>{{ device.ip }}</td></tr>
+  {% endfor %}
+</table>
 ```
 
-##### `if` statement
+Alternatively, [FastHTML](https://fastht.ml/) can generate HTML directly from
+Python objects without a separate template file.
 
-The `if` block conditionally renders its contents. For example:
+#### JavaScript / Node.js — Handlebars
 
-```json
-{ "is_healthy": true }
+[Handlebars](https://handlebarsjs.com/) is a popular choice for JavaScript tools.
+
+```javascript
+const Handlebars = require("handlebars");
+const fs = require("fs");
+
+const template = Handlebars.compile(fs.readFileSync("report.html.hbs", "utf8"));
+
+const data = {
+  devices: [
+    { name: "switch01", ip: "10.0.0.1" },
+    { name: "switch02", ip: "10.0.0.2" },
+  ],
+};
+
+fs.writeFileSync("input.html", template(data));
 ```
+
+**`report.html.hbs`**
 
 ```html
-{{if .is_healthy}}
-<p>The network is healthy.</p>
-{{end}}
+<h1>Device Report</h1>
+<table>
+  <tr><th>Name</th><th>IP</th></tr>
+  {{#each devices}}
+  <tr><td>{{name}}</td><td>{{ip}}</td></tr>
+  {{/each}}
+</table>
 ```
 
-result:
+#### Go — Templ
 
-```html
-<p>The network is healthy.</p>
-```
+[Templ](https://templ.guide/) is a type-safe HTML templating library for Go,
+and is the recommended approach for Go-based tools.
 
-If statements can also include an else clause:
+```go
+// devices.templ
+package report
 
-```json
-{ "is_healthy": false }
-```
-
-```html
-{{if .is_healthy}}
-<p>The network is healthy.</p>
-{{else}}
-<p>Unhealthy!</p>
-{{end}}
-```
-
-result:
-
-```html
-<p>Unhealthy!</p>
-```
-
-`if` statements evaluate "truthy" values and not just booleans. This means `0`,
-`""`, `[]`, or even a missing key will evaluate to false.
-
-Note that the `docgen --dev` mode warns you of missing keys on the CLI. This
-validation checks that keys mentioned in the template exist within the JSON and
-is to help you avoid mistyping key names. However, missing keys are still valid
-templating code and will still render correctly. If you want to turn off the
-template validation, run `docgen --dev --disable-validation`.
-
-##### `with` statement
-
-The `with` statement is similar to if, but changes the context to match the
-variable specified in the with statement.
-
-Suppose we want to conditionally render some text based on chassis health.
-Here's our example `input.json`:
-
-```json
-{
-  "chassis": {
-    "name": "device01",
-    "is_healthy": false
-  },
-  "module_count": 3
+templ DeviceTable(devices []Device) {
+    <h1>Device Report</h1>
+    <table>
+        <tr><th>Name</th><th>IP</th></tr>
+        for _, d := range devices {
+            <tr><td>{ d.Name }</td><td>{ d.IP }</td></tr>
+        }
+    </table>
 }
 ```
 
-This is how it might look while **not** using the `with` statement:
-
-```html
-{{if .chassis.is_healthy}}
-<p>{{.chassis.name}} is healthy!</p>
-{{else}}
-<p>{{.chassis.name}} is unhealthy!</p>
-{{end}}
+```go
+// main.go
+f, _ := os.Create("input.html")
+defer f.Close()
+report.DeviceTable(devices).Render(context.Background(), f)
 ```
 
-This is how it would look using the `with` statement. Notice that we shifted
-_into_ the `.chassis` context, so no longer need to refer to `.chassis` every
-time. This is an overly simplified example, but this can be very powerful in
-more complex templates, e.g. where the outer complex is referenced repeatedly.
+Go's standard `html/template` or `text/template` packages also work if you
+prefer not to add a dependency.
 
-```html
-{{with .chassis}} {{if .is_healthy}}
-<p>{{.name}} is healthy!</p>
-{{else}}
-<p>{{.name}} is unhealthy!</p>
-{{end}} {{end}}
-```
+#### Markdown
 
-When using the `with` statement, you can always refer to the templating root
-with the special `$` indicator. Suppose in the previous example, we also want to
-refer to the `.modules_count` field. Note that this field is not under
-`.chassis`.
+If your content is simple prose with basic tables or lists, generating Markdown
+directly (e.g. with string formatting or a Markdown builder library) is often
+the simplest approach. Docgen accepts `.md` and `.markdown` files in addition
+to `.html`.
 
-```html
-{{with .chassis}} {{if .is_healthy}}
-<p>{{.name}} is healthy!</p>
-{{else}}
-<p>{{.name}} is unhealthy!</p>
-{{end}}
-<p>{{.module_count}} modules found.</p>
-{{end}}
-```
+### Direct Template Tags
 
-##### `range` statement
+In addition to inserting content from an input file, you can embed `{{tag}}`
+placeholders directly in your Word document template. These are rendered using
+a JSON context file and are useful for fields that appear in the document
+template itself — such as cover page fields, headers, or footers — rather than
+in the body content.
 
-The `range` block loops over a list or object (dictionary):
+Pass a JSON context file with `--context context.json`:
 
 ```json
 {
-  "devices": [
-    { "name": "switch01" },
-    { "name": "switch02" },
-    { "name": "switch03" }
-  ]
+  "customer": "Acme Corp",
+  "date": "26 Jun 2026",
+  "author": "Jane Smith"
 }
 ```
 
-```html
-<ul>
-  {{range .devices}}
-  <li>{{.name}}</li>
-  {{end}}
-</ul>
-```
+Any `{{customer}}`, `{{date}}`, or `{{author}}` tags in the Word template are
+replaced with the corresponding values. These tags use Go's `text/template`
+syntax, so simple expressions and conditionals are supported, but complex logic
+belongs in your input generation step.
 
-You can also assign the items to variables. Note that this time, devices is an
-obect instead of an array.
-
-```html
-<ul>
-  {{range $index, $device := .devices}}
-  <li>{{$device.name}} is device number {{$index}}.</li>
-  {{end}}
-</ul>
-```
-
-##### `include` helper
-
-The include helper is a custom helper that lets you include additional
-templates. For example:
-
-**`main.html`**
-
-```html
-<h1>Devices</h1>
-<p>This section outlines the device details for {{customer}}.</p>
-{{include "devices"}}
-```
-
-**`devices.html`**
-
-```html
-{{if .devices}}
-<p>The following devices were found in your network:</p>
-<ul>
-  {{range .devices}}
-  <li>{{.}}</li>
-  {{end}}
-</ul>
-{{else}}
-<p>No devices found.</p>
-{{end}}
-```
-
-##### `date` helper
-
-The `date` helper inserts the current date in RFC53222 format, e.g. 21 Jan 2013.
-This format is generaly more user friendly than ISO year-first formats while
-avoiding US/Europe ambiguity of MM/DD vs DD/MM.
-
-##### External documentation
-
-- [Hashicorp's Nomad documentation](https://developer.hashicorp.com/nomad/tutorials/templates/go-template-syntax)
-- [Go text/template documentation](https://pkg.go.dev/text/template)
-- [Sprig helper functions](http://masterminds.github.io/sprig/)
-
-#### Advanced Template Examples
+#### Advanced HTML Examples
 
 ##### Column widths
 
@@ -444,20 +317,18 @@ header:
     <th>Name</th>
     <th colspan="2">Address</th>
   </tr>
-  {{range .devices}}
   <tr>
-    <td>{{.name}}</td>
-    <td>{{.ip}}</td>
-    <td>{{.pfx}}</td>
+    <td>switch01</td>
+    <td>10.0.0.1</td>
+    <td>/24</td>
   </tr>
-  {{end}}
 </table>
 ```
 
 `rowspan` offers a unique challenge. Namely, the spanned cell is only rendered
 in the first row (the one with the rowspan attribute). From there on, that cell
-is excluded in the HTML. Before looking at templating, this is an example of
-correctly formatted HTML using rowspan:
+is excluded in the HTML. This is an example of correctly formatted HTML using
+rowspan:
 
 ```html
 <table>
@@ -476,46 +347,25 @@ correctly formatted HTML using rowspan:
 ```
 
 Note, specifically, that the spanned row indicating the model is excluded from
-the second row. That's because this field is spanned across two rows. This
-presents a challenge for using a simple `range` command.
+the second row. That's because this field is spanned across two rows. When
+generating this HTML from your templating engine, you need to emit the `rowspan`
+cell only in the first row of each group and omit it from subsequent rows.
 
-The solution is to use a couple of helpers from the
-[sprig](http://masterminds.github.io/sprig/) library to render the first row
-separately from the rest. Consider the following data that has been indexed by
-model:
-
-```json
-{
-  "devices_by_model": {
-    "93180YC-EX": [
-      { "name": "switch01", "model": "93180YC-EX" },
-      { "name": "switch02", "model": "93180YC-EX" }
-    ]
-  }
-}
-```
+Here's how that looks in Jinja2:
 
 ```html
 <table>
-  <tr>
-    <th>Model</th>
-    <th>Switches</th>
-  </tr>
-
-  <!--render the first row, including the colspan-->
-  {{first .devices_by_model}}
-  <tr>
-    <td rowspan="{{len .devices_by_model}}">{{.model}}</td>
-    <td>{{.name}}</td>
-  </tr>
-  {{end}}
-
-  <!--render the remaining rows-->
-  {{range rest .devices_by_model}}
-  <tr>
-    <td>{{.name}}</td>
-  </tr>
-  {{end}}
+  <tr><th>Model</th><th>Switch</th></tr>
+  {% for model, switches in devices_by_model.items() %}
+    {% for switch in switches %}
+    <tr>
+      {% if loop.first %}
+      <td rowspan="{{ switches|length }}">{{ model }}</td>
+      {% endif %}
+      <td>{{ switch.name }}</td>
+    </tr>
+    {% endfor %}
+  {% endfor %}
 </table>
 ```
 
@@ -563,9 +413,9 @@ creation is performed.
 
 **Pandoc** is a universal document transformation library which will translate
 from Markdown or HTML to docx. Other solutions can be used to create an HTML or
-Markdown document (e.g. Jinja2, text/template, etc), and then Pandoc can be used
-to transform this into a Microsoft Word document. This was the predecesor to
-docgen and is the closest in architecture.
+Markdown document (e.g. Jinja2, Handlebars, Templ, etc), and then Pandoc can be
+used to transform this into a Microsoft Word document. This was the predecesor
+to docgen and is the closest in architecture.
 
 **Challenges:**
 
