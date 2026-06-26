@@ -1,0 +1,26 @@
+{
+  "version": "1.5.0",
+  "versionUpdateHandler": "error",
+  "versionOutputs": {
+    "tagsToCreate": [
+      "patch"
+    ],
+    "createRelease": [
+      "patch"
+    ],
+    "incrementType": "patch",
+    "preid": "",
+    "versionType": {
+      "default": {
+        "prefixToAdd": "",
+        "suffixToAdd": ""
+      },
+      "tag": {
+        "prefixToAdd": "v",
+        "suffixToAdd": ""
+      }
+    }
+  },
+  "triggerUpdateReview": true,
+  "versionTimeStamp": 0
+}

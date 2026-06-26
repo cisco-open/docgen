@@ -1,0 +1,43 @@
+name: OOXML Integration Tests
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ooxml-integration:
+    name: OOXML Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: cisco-actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Set up Node.js
+        uses: cisco-actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Node.js dependencies
+        run: |
+          cd tools/ooxml-validator-node
+          npm ci
+
+      - name: Run integration tests
+        run: go test -tags=integration -v ./...

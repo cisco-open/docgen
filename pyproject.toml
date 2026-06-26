@@ -1,0 +1,7 @@
+[tool.bandit]
+exclude_dirs = [".venv", "tools", "resources"]
+skips = ["B101"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.backends.legacy:build"

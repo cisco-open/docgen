@@ -1,0 +1,38 @@
+# Example configuration file for docgen
+#
+# To use this file, run:
+#   docgen --config config-example.yaml
+#
+# When using a config file, command-line arguments are ignored.
+
+# Path to the tag context JSON file (optional)
+# If not specified, defaults to "context.json"
+context: context.json
+
+# Path to the input file (.html, .md, or .markdown)
+# If not specified, defaults to "input.html"
+input: input.html
+
+# Path to the output Word document file
+# If not specified, defaults to "out.docx"
+output: out.docx
+
+# Path to a custom Word document template (optional)
+# If not specified, uses the built-in template
+template: ""
+
+# Bookmark name to render content into
+# If not specified, defaults to "main"
+bookmark: main
+
+# Path to the log file
+# If not specified, defaults to "docgen.log"
+logfile: docgen.log
+
+# Enable verbose (debug level) logging
+# If not specified, defaults to false
+verbose: false
+
+# Working directory for relative paths
+# If not specified, uses the current working directory
+workdir: ""

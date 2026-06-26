@@ -1,0 +1,16 @@
+{
+  "name": "ooxml-validator-node",
+  "version": "1.0.0",
+  "description": "Node.js wrapper for validating OOXML documents",
+  "type": "module",
+  "main": "validate.js",
+  "scripts": {
+    "validate": "node validate.js"
+  },
+  "dependencies": {
+    "@xarsh/ooxml-validator": "^0.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
