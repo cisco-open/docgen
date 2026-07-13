@@ -23,8 +23,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ciscotools/docgen/internal/ooxml"
-	"github.com/ciscotools/docgen/internal/templates"
+	"github.com/cisco-open/docgen/internal/ooxml"
+	"github.com/cisco-open/docgen/internal/templates"
 	"github.com/cockroachdb/errors"
 )
 

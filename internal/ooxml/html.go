@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ciscotools/docgen/internal/log"
+	"github.com/cisco-open/docgen/internal/log"
 
 	"golang.org/x/net/html"
 )

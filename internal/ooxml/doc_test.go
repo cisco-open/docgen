@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"github.com/beevik/etree"
-	"github.com/ciscotools/docgen/internal/templates"
+	"github.com/cisco-open/docgen/internal/templates"
 	"github.com/stretchr/testify/assert"
 )
 

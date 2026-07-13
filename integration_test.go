@@ -24,8 +24,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ciscotools/docgen"
-	"github.com/ciscotools/docgen/internal/templates"
+	"github.com/cisco-open/docgen"
+	"github.com/cisco-open/docgen/internal/templates"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -184,7 +184,7 @@ func TestIntegrationLinks(t *testing.T) {
 	html := strings.NewReader(`
 		<h2>Useful Links</h2>
 		<p>Visit <a href="https://www.cisco.com">Cisco's website</a> for more information.</p>
-		<p>Check the <a href="https://github.com/ciscotools/docgen">docgen repository</a> on GitHub.</p>
+		<p>Check the <a href="https://github.com/cisco-open/docgen">docgen repository</a> on GitHub.</p>
 	`)
 	err = doc.InsertHTML(html, "main")
 	assert.NoError(t, err)

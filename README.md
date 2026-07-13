@@ -102,12 +102,12 @@ See [config-example.yaml](config-example.yaml) for a complete example with docum
 ### Simple Example
 
 Download the latest docgen release from
-[GitHub releases](https://github.com/ciscotools/docgen/releases).
+[GitHub releases](https://github.com/cisco-open/docgen/releases).
 
 Clone the example repo:
 
 ```shell
-git clone --depth 1 https://github.com/ciscotools/docgen-example.git
+git clone --depth 1 https://github.com/cisco-open/docgen-example.git
 ```
 
 Copy or move the `docgen` (`docgen.exe` for Windows) file into your

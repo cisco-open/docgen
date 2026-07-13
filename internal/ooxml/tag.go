@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/beevik/etree"
-	"github.com/ciscotools/docgen/internal/html"
+	"github.com/cisco-open/docgen/internal/html"
 )
 
 // Tag is a text templating tag

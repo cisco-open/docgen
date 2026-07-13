@@ -5,7 +5,7 @@ The `docgen` package provides functionality for generating Microsoft Word docume
 ## Installation
 
 ```bash
-go get github.com/ciscotools/docgen
+go get github.com/cisco-open/docgen
 ```
 
 ## Quick Start
@@ -18,7 +18,7 @@ import (
     "os"
     "strings"
 
-    "github.com/ciscotools/docgen"
+    "github.com/cisco-open/docgen"
 )
 
 func main() {

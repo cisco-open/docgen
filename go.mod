@@ -1,4 +1,4 @@
-module github.com/ciscotools/docgen
+module github.com/cisco-open/docgen
 
 go 1.25.5
 

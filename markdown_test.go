@@ -19,8 +19,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ciscotools/docgen"
-	"github.com/ciscotools/docgen/internal/templates"
+	"github.com/cisco-open/docgen"
+	"github.com/cisco-open/docgen/internal/templates"
 	"github.com/stretchr/testify/assert"
 )
 

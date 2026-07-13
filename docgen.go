@@ -50,7 +50,7 @@ package docgen
 import (
 	"io"
 
-	"github.com/ciscotools/docgen/internal/ooxml"
+	"github.com/cisco-open/docgen/internal/ooxml"
 )
 
 // Document represents a Microsoft Word document in Office Open XML format.

@@ -1,6 +1,6 @@
 # docgen Python library
 
-Python library for generating Microsoft Word documents using [docgen](https://github.com/ciscotools/docgen).
+Python library for generating Microsoft Word documents using [docgen](https://github.com/cisco-open/docgen).
 
 ## Installation
 
@@ -9,7 +9,7 @@ pip install docgen
 ```
 
 The `docgen` binary must also be available on `PATH`.
-See the [docgen releases](https://github.com/ciscotools/docgen/releases) for installation instructions.
+See the [docgen releases](https://github.com/cisco-open/docgen/releases) for installation instructions.
 
 ## Quick Start
 

@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ciscotools/docgen/pkg/config"
+	"github.com/cisco-open/docgen/pkg/config"
 	"github.com/stretchr/testify/assert"
 )
 

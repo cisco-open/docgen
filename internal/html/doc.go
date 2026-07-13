@@ -27,7 +27,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ciscotools/docgen/internal/log"
+	"github.com/cisco-open/docgen/internal/log"
 
 	"github.com/Masterminds/sprig/v3"
 )

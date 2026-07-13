@@ -18,7 +18,7 @@ package ooxml
 // XML util
 
 import (
-	"github.com/ciscotools/docgen/internal/log"
+	"github.com/cisco-open/docgen/internal/log"
 
 	"github.com/beevik/etree"
 )

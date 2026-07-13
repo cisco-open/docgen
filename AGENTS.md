@@ -4,7 +4,7 @@
 
 `docgen` generates Microsoft Word (`.docx`) documents from HTML or Markdown
 input files using a template `.docx` and a JSON context. It is both a CLI tool
-(`cmd/docgen`) and an importable Go package (`github.com/ciscotools/docgen`).
+(`cmd/docgen`) and an importable Go package (`github.com/cisco-open/docgen`).
 There is also a Python wrapper in `python/`.
 
 ## Build, Test, and Lint
@@ -58,7 +58,7 @@ work happens in `internal/ooxml`.
   (`document.xml`, `_rels/`, `numbering.xml`, headers, footers) are each held as
   an `ooxmlDoc` (an `etree.Document` + path).
 
-- **Logging** uses `github.com/ciscotools/docgen/internal/log` (zerolog-based).
+- **Logging** uses `github.com/cisco-open/docgen/internal/log` (zerolog-based).
   Use `log.Debug()`, `log.Info()`, `log.Fatal()` — not `fmt` or the standard
   `log` package.
 

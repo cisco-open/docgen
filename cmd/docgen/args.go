@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/alexflint/go-arg"
-	"github.com/ciscotools/docgen/pkg/config"
+	"github.com/cisco-open/docgen/pkg/config"
 )
 
 // Populated from CI/CD

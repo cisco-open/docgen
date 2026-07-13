@@ -21,7 +21,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ciscotools/docgen/pkg/config"
+	"github.com/cisco-open/docgen/pkg/config"
 )
 
 const cafSharePath = "/share"
