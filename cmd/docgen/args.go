@@ -28,16 +28,15 @@ var version = "(dev)"
 
 // Args are CLI arguments.
 type Args struct {
-	Config   string `arg:"--config"                     help:"Path to YAML configuration file"`
-	CAF      bool   `arg:"--caf"                        help:"Run in CAF service mode"`
-	Context  string `arg:"-c,--context,env:CONTEXT"     help:"Tag context JSON file (optional)"`
-	Input    string `arg:"-i,--input,env:INPUT"         help:"Input file (.html, .md, or .markdown)"          default:"input.html"`
-	Output   string `arg:"-o,--output"                  help:"Output file"                                     default:"out.docx"`
-	Template string `arg:"--template"                   help:"Use a custom docx template"`
-	Bookmark string `arg:"--bookmark"                   help:"Bookmark to render into"                         default:"main"`
-	Logfile  string `arg:"--logfile"                    help:"Logfile"                                         default:"docgen.log"`
-	Verbose  bool   `arg:"-v,--verbose"                 help:"Verbose output"`
-	Workdir  string `arg:"--workdir"                    help:"Working directory"`
+	Config   string `arg:"--config"                 help:"Path to YAML configuration file"`
+	Context  string `arg:"-c,--context,env:CONTEXT" help:"Tag context JSON file (optional)"`
+	Input    string `arg:"-i,--input,env:INPUT"     help:"Input file (.html, .md, or .markdown)" default:"input.html"`
+	Output   string `arg:"-o,--output"              help:"Output file"                           default:"out.docx"`
+	Template string `arg:"--template"               help:"Use a custom docx template"`
+	Bookmark string `arg:"--bookmark"               help:"Bookmark to render into"               default:"main"`
+	Logfile  string `arg:"--logfile"                help:"Logfile"                               default:"docgen.log"`
+	Verbose  bool   `arg:"-v,--verbose"             help:"Verbose output"`
+	Workdir  string `arg:"--workdir"                help:"Working directory"`
 }
 
 // Description is the CLI description string.
@@ -51,21 +50,10 @@ func (Args) Version() string {
 }
 
 // readArgs collects the CLI args and returns a config.Config.
-// If --caf is provided, configuration is read from /share/job.json.
 // If a config file is provided, CLI parameters are ignored.
 func readArgs() config.Config {
 	var args Args
 	arg.MustParse(&args)
-
-	// CAF mode: read job.json from /share
-	if args.CAF {
-		cfg, err := readCAF()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading CAF job: %v\n", err)
-			os.Exit(1)
-		}
-		return cfg
-	}
 
 	// If config file is provided, load from it (ignoring CLI params)
 	if args.Config != "" {
