@@ -1,27 +1,16 @@
 ## Overview
 
-Docgen automates generating _high-quality_ CX deliverable documents from our
-tools.
+Docgen automates generating _high-quality_ documents using declarative HTML or
+Markdown templates.
 
 See the [Quick Start](#quick-start) to get started immediately.
 
 ---
 
-Writing our deliverable documents is often a time-consuming and error-prone
-process. Even with good templates, e.g. in SCDP, populating customer-specific
-information can be a consderable effort. In CX, we've done a great job with
-automating other aspects of delivery, but deliverable document generation is
-still often harder than it should be.
-
-This tool consumes the output of our existing automation tools, e.g. analysis
-tools, build tools, etc., and generates deliverable documentation from this
+This tool consumes the output of your existing automation tools, e.g. analysis
+tools, build tools, etc., and generates finished documentation from this
 output. It does this accurately, efficiently, and reliably, and generates
-high-quality documentation that conforms to our CX templating standards.
-
-As a tool owner, you can integrate this tool into your existing tool to bolt on
-document generation or improve on existing, difficult to maintain solutions. As
-an end-user doing CX delivery, this tool will transparently generate your
-deliverable documents providing significant time and cost savings delivery.
+high-quality documentation.
 
 See the [Comparison](#comparison-to-other-solutions) section for comparison with
 other solutions, which will further illustrate the unique value this tool
@@ -34,7 +23,8 @@ provides.
 Docgen supports two ways to configure its behavior:
 
 1. **Command-line arguments** (default): Pass parameters directly via CLI
-2. **YAML configuration file**: Use a config file for easier management and reusability
+2. **YAML configuration file**: Use a config file for easier management and
+   reusability
 
 #### Using Command-Line Arguments
 
@@ -58,7 +48,8 @@ For easier management and reusability, you can use a YAML configuration file:
 docgen --config config.yaml
 ```
 
-**Important:** When a config file is provided, all command-line arguments (except `--config`) are ignored.
+**Important:** When a config file is provided, all command-line arguments
+(except `--config`) are ignored.
 
 ##### Example Configuration File
 
@@ -90,12 +81,14 @@ verbose: false
 workdir: ""
 ```
 
-See [config-example.yaml](config-example.yaml) for a complete example with documentation.
+See [config-example.yaml](config-example.yaml) for a complete example with
+documentation.
 
 ##### Benefits of Using Configuration Files
 
 - **Reusability**: Save different configurations for different projects
-- **Version control**: Check configuration files into git alongside your templates
+- **Version control**: Check configuration files into git alongside your
+  templates
 - **Simplicity**: Avoid long command lines with many arguments
 - **Documentation**: YAML comments can document your configuration choices
 
@@ -134,8 +127,8 @@ Two things are provided in this example:
 Running the development server does the following:
 
 1. Reads the `input.html` (or `.md`) file as the document body content.
-2. Inserts that content into the `main` bookmark in the deliverable document.
-   Docgen uses a built-in CX document template by default, but you can supply
+2. Inserts that content into the `main` bookmark in the output document.
+   Docgen uses a built-in default document template, but you can supply
    your own custom template with pre-existing content.
 3. Optionally renders `{{tag}}` placeholders in the Word template using values
    from `context.json`.
@@ -179,9 +172,15 @@ with open("input.html", "w") as f:
 ```html
 <h1>Device Report</h1>
 <table>
-  <tr><th>Name</th><th>IP</th></tr>
+  <tr>
+    <th>Name</th>
+    <th>IP</th>
+  </tr>
   {% for device in devices %}
-  <tr><td>{{ device.name }}</td><td>{{ device.ip }}</td></tr>
+  <tr>
+    <td>{{ device.name }}</td>
+    <td>{{ device.ip }}</td>
+  </tr>
   {% endfor %}
 </table>
 ```
@@ -191,7 +190,8 @@ Python objects without a separate template file.
 
 #### JavaScript / Node.js — Handlebars
 
-[Handlebars](https://handlebarsjs.com/) is a popular choice for JavaScript tools.
+[Handlebars](https://handlebarsjs.com/) is a popular choice for JavaScript
+tools.
 
 ```javascript
 const Handlebars = require("handlebars");
@@ -214,17 +214,23 @@ fs.writeFileSync("input.html", template(data));
 ```html
 <h1>Device Report</h1>
 <table>
-  <tr><th>Name</th><th>IP</th></tr>
+  <tr>
+    <th>Name</th>
+    <th>IP</th>
+  </tr>
   {{#each devices}}
-  <tr><td>{{name}}</td><td>{{ip}}</td></tr>
+  <tr>
+    <td>{{name}}</td>
+    <td>{{ip}}</td>
+  </tr>
   {{/each}}
 </table>
 ```
 
 #### Go — Templ
 
-[Templ](https://templ.guide/) is a type-safe HTML templating library for Go,
-and is the recommended approach for Go-based tools.
+[Templ](https://templ.guide/) is a type-safe HTML templating library for Go, and
+is the recommended approach for Go-based tools.
 
 ```go
 // devices.templ
@@ -255,16 +261,16 @@ prefer not to add a dependency.
 
 If your content is simple prose with basic tables or lists, generating Markdown
 directly (e.g. with string formatting or a Markdown builder library) is often
-the simplest approach. Docgen accepts `.md` and `.markdown` files in addition
-to `.html`.
+the simplest approach. Docgen accepts `.md` and `.markdown` files in addition to
+`.html`.
 
 ### Direct Template Tags
 
 In addition to inserting content from an input file, you can embed `{{tag}}`
-placeholders directly in your Word document template. These are rendered using
-a JSON context file and are useful for fields that appear in the document
-template itself — such as cover page fields, headers, or footers — rather than
-in the body content.
+placeholders directly in your Word document template. These are rendered using a
+JSON context file and are useful for fields that appear in the document template
+itself — such as cover page fields, headers, or footers — rather than in the
+body content.
 
 Pass a JSON context file with `--context context.json`:
 
@@ -355,17 +361,19 @@ Here's how that looks in Jinja2:
 
 ```html
 <table>
-  <tr><th>Model</th><th>Switch</th></tr>
-  {% for model, switches in devices_by_model.items() %}
-    {% for switch in switches %}
-    <tr>
-      {% if loop.first %}
-      <td rowspan="{{ switches|length }}">{{ model }}</td>
-      {% endif %}
-      <td>{{ switch.name }}</td>
-    </tr>
-    {% endfor %}
-  {% endfor %}
+  <tr>
+    <th>Model</th>
+    <th>Switch</th>
+  </tr>
+  {% for model, switches in devices_by_model.items() %} {% for switch in
+  switches %}
+  <tr>
+    {% if loop.first %}
+    <td rowspan="{{ switches|length }}">{{ model }}</td>
+    {% endif %}
+    <td>{{ switch.name }}</td>
+  </tr>
+  {% endfor %} {% endfor %}
 </table>
 ```
 
@@ -385,18 +393,8 @@ exist in the current folder.
 ## Comparison to other solutions
 
 This solution was created because of a distinct need for better document
-automation for CX delivery. The following solutions were considered, and have
-all been used in production leading up to this tool:
-
-**SCDP** is our Atlasian Confluence deployment, and is a collaborative
-templating, document creation, and document sharing platform. Document templates
-can be reused and tailored to the needs of each project.
-
-**Challenges:**
-
-- SCDP is a document collaboration and templating solution; not an automation
-  solution. There is no clear solution for automating _content_ into SCDP
-  templates.
+automation. The following solutions were considered, and have all been used in
+production leading up to this tool:
 
 **Programmtic document creation** is where you (the tool owner) use a docx
 library to progressively build the document throughout your code. For example,
@@ -426,22 +424,22 @@ to docgen and is the closest in architecture.
 
 ### Feature Comparison
 
-| Feature                                       | docgen             | SCDP               | Library            | Pandoc             |
-| --------------------------------------------- | :----------------- | :----------------- | :----------------- | :----------------- |
-| Automated                                     | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Separation of business and presentation logic | :white_check_mark: | **na**             | :x:                | :white_check_mark: |
-| Declarative                                   | :white_check_mark: | **na**             | :x:                | :white_check_mark: |
-| Easy to integrate with new tools              | :white_check_mark: | :x:                | :x: **¹**          | :x: **²**          |
-| Git-friendly                                  | :white_check_mark: | **na**             | :x: **³**          | :white_check_mark: |
-| Will not create a broken Word document        | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                |
-| Fast / memory efficient                       | :white_check_mark: | **na**             | :white_check_mark: | :x:                |
-| Developer Friendly                            | :white_check_mark: | :x:                | :white_check_mark: | :x: **⁴**          |
+| Feature                                       | docgen             | Library            | Pandoc             |
+| --------------------------------------------- | :----------------- | :----------------- | :----------------- |
+| Automated                                     | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Separation of business and presentation logic | :white_check_mark: | :x:                | :white_check_mark: |
+| Declarative                                   | :white_check_mark: | :x:                | :white_check_mark: |
+| Easy to integrate with new tools              | :white_check_mark: | :x: **¹**          | :x: **²**          |
+| Git-friendly                                  | :white_check_mark: | :x: **³**          | :white_check_mark: |
+| Will not create a broken Word document        | :white_check_mark: | :white_check_mark: | :x:                |
+| Fast / memory efficient                       | :white_check_mark: | :white_check_mark: | :x:                |
+| Developer Friendly                            | :white_check_mark: | :white_check_mark: | :x: **⁴**          |
 
 **¹** A docx library such as python-docx can be very easy to get started with,
 but writing _quality_ documentation in Python can be very challenging.
 
 **²** Several independent components are required for this solution, making it
-much more difficult for an end-user (conulting engineer) to run.
+much more difficult for an end-user to run.
 
 **³** Mixing business and presentation logic makes it very difficult to
 determine which commits changes are documentation changes vs core code changes.
@@ -468,7 +466,9 @@ go test ./...
 
 #### Integration Tests
 
-Integration tests validate that generated `.docx` files conform to the OOXML standard. See [INTEGRATION_TESTING.md](INTEGRATION_TESTING.md) for detailed instructions on running integration tests locally.
+Integration tests validate that generated `.docx` files conform to the OOXML
+standard. See [INTEGRATION_TESTING.md](INTEGRATION_TESTING.md) for detailed
+instructions on running integration tests locally.
 
 Quick start:
 
@@ -496,14 +496,13 @@ SPDX-License-Identifier: Apache-2.0
 
 Copyright 2026 Cisco Systems, Inc. and their affiliates
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+<http://www.apache.org/licenses/LICENSE-2.0>
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
