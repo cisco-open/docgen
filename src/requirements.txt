@@ -1,8 +1,0 @@
-# Runtime dependencies
-# None — the package uses Python stdlib only (json, os, shutil, subprocess, sys, tempfile, pathlib)
-
-# Development and build dependencies
-pytest>=7
-coverage
-build
-wheel
