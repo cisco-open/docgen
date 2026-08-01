@@ -7,10 +7,9 @@ See the [Quick Start](#quick-start) to get started immediately.
 
 ---
 
-This tool consumes the output of your existing automation tools, e.g. analysis
-tools, build tools, etc., and generates finished documentation from this
-output. It does this accurately, efficiently, and reliably, and generates
-high-quality documentation.
+This tool consumes the output of existing automation tools, e.g. analysis tools,
+build tools, etc., and generates finished documentation from this output. It
+does this accurately, efficiently, and reliably. high-quality documentation.
 
 See the [Comparison](#comparison-to-other-solutions) section for comparison with
 other solutions, which will further illustrate the unique value this tool
@@ -20,11 +19,12 @@ provides.
 
 ### Configuration Options
 
-Docgen supports two ways to configure its behavior:
+Docgen supports multiple ways to configure its behavior:
 
 1. **Command-line arguments** (default): Pass parameters directly via CLI
 2. **YAML configuration file**: Use a config file for easier management and
    reusability
+3. Direct use as a Go library
 
 #### Using Command-Line Arguments
 
@@ -50,6 +50,46 @@ docgen --config config.yaml
 
 **Important:** When a config file is provided, all command-line arguments
 (except `--config`) are ignored.
+
+#### Using Docgen as a Go Library
+
+Docgen is also usable directly as a Go library, without shelling out to the
+CLI:
+
+```go
+import "github.com/cisco-open/docgen"
+
+template, err := os.ReadFile("template.docx")
+if err != nil {
+    log.Fatal(err)
+}
+
+doc, err := docgen.NewDocument(template)
+if err != nil {
+    log.Fatal(err)
+}
+
+// Insert HTML (or Markdown, via doc.InsertMarkdown) at a bookmark
+htmlContent := strings.NewReader("<p>Hello, World!</p>")
+if err := doc.InsertHTML(htmlContent, "main"); err != nil {
+    log.Fatal(err)
+}
+
+// Optionally render {{tag}} placeholders in the template
+if err := doc.RenderTags(map[string]string{"customer": "Acme Corp"}); err != nil {
+    log.Fatal(err)
+}
+
+if err := doc.WriteFile("output.docx"); err != nil {
+    log.Fatal(err)
+}
+```
+
+`Document` also exposes `Write(io.Writer)` for streaming output and
+`GetBookmark(name string)` for lower-level access to a bookmark's OOXML
+element. See the [`docgen` package
+documentation](https://pkg.go.dev/github.com/cisco-open/docgen) for the full
+API reference.
 
 ##### Example Configuration File
 
@@ -84,7 +124,7 @@ workdir: ""
 See [config-example.yaml](config-example.yaml) for a complete example with
 documentation.
 
-##### Benefits of Using Configuration Files
+##### Benefits of Using Configuration Files in automation
 
 - **Reusability**: Save different configurations for different projects
 - **Version control**: Check configuration files into git alongside your
@@ -106,30 +146,29 @@ git clone --depth 1 https://github.com/cisco-open/docgen-example.git
 Copy or move the `docgen` (`docgen.exe` for Windows) file into your
 `docgen-example` folder that you just cloned.
 
-Run the development tool while in that folder: `./docgen --dev`. This starts the
-development environment, listens for changes to the files, validates your
-templates for correctness, and opens a document preview in your default browser.
+Run docgen while in that folder: `./docgen --input input.html --output
+out.docx --context context.json`.
 
 #### Understanding the Simple Example
 
 Two things are provided in this example:
 
 1. An example `input.html` file. This is the HTML content that will be inserted
-   into the deliverable document. In a real workflow, you generate this file
-   from your existing automation tool using a templating engine suited to your
-   language — e.g. Jinja2 for Python, Handlebars for JavaScript, or Templ for
-   Go. See the [Generating Input Content](#generating-input-content) section for
-   examples.
+   into the deliverable document. In a real workflow, you would generate this
+   file from your existing automation tool using a templating engine suited to
+   your language — e.g. Jinja2 for Python, Handlebars for JavaScript, Templ for
+   Go, etc. See the [Generating Input Content](#generating-input-content)
+   section for examples.
 2. Optionally, a `context.json` file for populating `{{tag}}` placeholders
    directly in the Word document template (e.g. cover page fields, headers,
    footers). See [Direct Template Tags](#direct-template-tags).
 
-Running the development server does the following:
+Running docgen does the following:
 
 1. Reads the `input.html` (or `.md`) file as the document body content.
-2. Inserts that content into the `main` bookmark in the output document.
-   Docgen uses a built-in default document template, but you can supply
-   your own custom template with pre-existing content.
+2. Inserts that content into the `main` bookmark in the output document. Docgen
+   uses a built-in default document template, but you can supply your own custom
+   template with pre-existing content.
 3. Optionally renders `{{tag}}` placeholders in the Word template using values
    from `context.json`.
 
@@ -385,10 +424,9 @@ Images are supported with the HTML image tag:
 <img src="/router.png" />
 ```
 
-Images must be in either `png` or `jpeg` format. The preceeding slash will be
-read by the development server, which will try to read the image in relation to
-the current working directory. In this example, `router.png` is expected to
-exist in the current folder.
+Images must be in either `png` or `jpeg` format. The preceeding slash is
+resolved relative to the current working directory. In this example,
+`router.png` is expected to exist in the current folder.
 
 ## Comparison to other solutions
 
